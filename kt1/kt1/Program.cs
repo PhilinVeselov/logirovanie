@@ -1,16 +1,23 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using kt1;
 using Microsoft.Extensions.DependencyInjection;
-using kt1;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 class Program
 {
     static void Main(string[] args)
     {
-        using var serviceProvider = new ServiceCollection()
-            .AddLogging(config =>
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console()
+            .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+            .CreateLogger();
+
+        var serviceProvider = new ServiceCollection()
+            .AddLogging(builder =>
             {
-                config.AddConsole();
-                config.SetMinimumLevel(LogLevel.Trace);
+                builder.ClearProviders();
+                builder.AddSerilog();
             })
             .AddSingleton<TaskService>()
             .BuildServiceProvider();
@@ -18,7 +25,7 @@ class Program
         var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
         var taskService = serviceProvider.GetRequiredService<TaskService>();
 
-        logger.LogTrace("Приложение запущено.");
+        logger.LogInformation("Приложение запущено.");
 
         while (true)
         {
@@ -55,6 +62,7 @@ class Program
                         break;
                     case "5":
                         logger.LogCritical("Выход из приложения.");
+                        Log.CloseAndFlush();
                         return;
                     default:
                         logger.LogWarning("Выбрана неверная опция.");
@@ -63,7 +71,7 @@ class Program
             }
             catch (Exception ex)
             {
-                logger.LogCritical(ex, "Произошло необработанное исключение.");
+                logger.LogError(ex, "Произошло исключение.");
             }
         }
     }
