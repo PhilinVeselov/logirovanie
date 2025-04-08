@@ -10,8 +10,13 @@ class Program
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.Console()
-            .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+            .WriteTo.File(
+                new Serilog.Formatting.Json.JsonFormatter(renderMessage: true),
+                "logs/log-.json",
+                rollingInterval: RollingInterval.Day
+            )
             .CreateLogger();
+
 
         var serviceProvider = new ServiceCollection()
             .AddLogging(builder =>
