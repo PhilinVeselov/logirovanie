@@ -76,8 +76,14 @@ class Program
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Произошло исключение.");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("!!! Ошибка !!!");
+                Console.ResetColor();
+
+                logger.LogError(ex, "Произошло исключение при выполнении команды: {Command}", input);
+
             }
+
         }
     }
 }
