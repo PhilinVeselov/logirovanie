@@ -8,7 +8,7 @@ class Program
     static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
+            .MinimumLevel.Verbose() 
             .WriteTo.Console()
             .WriteTo.File(
                 new Serilog.Formatting.Json.JsonFormatter(renderMessage: true),
